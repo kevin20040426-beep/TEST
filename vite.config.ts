@@ -6,13 +6,12 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react()],
-    // 重要：請將 '/alphatrade-pro/' 替換為您在 GitHub 上建立的 Repository 名稱
-    // 例如您的 Repo 是 'my-stock'，這裡就填 '/my-stock/'
-    base: '/alphatrade-pro/', 
+    // 使用相對路徑 './'，確保無論 Repo 名稱是什麼(如 alphatrade-pro 或 TEST)都能正常顯示
+    base: './', 
     define: {
-      // 橋接環境變數：將 VITE_GOOGLE_API_KEY 注入為 process.env.API_KEY
-      'process.env.API_KEY': JSON.stringify(env.VITE_GOOGLE_API_KEY),
-      // 防止其他套件存取 process.env 時報錯
+      // 確保 API KEY 即使為空也不會導致錯誤
+      'process.env.API_KEY': JSON.stringify(env.VITE_GOOGLE_API_KEY || ''),
+      // 防止瀏覽器報錯 process is not defined
       'process.env': {}
     }
   }
