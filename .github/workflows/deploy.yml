@@ -8,7 +8,8 @@ permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  # 第一階段：建置 (Build)
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,20 +19,43 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          # 移除 cache: 'npm' 以解決沒有 package-lock.json 時報錯的問題
 
+      # 使用 npm install 自動產生依賴關係
       - name: Install dependencies
         run: npm install
 
       - name: Build
         run: npm run build
         env:
-          # 這裡將您在 GitHub 設定的 Secrets 注入到打包過程中
+          # 在建置階段注入環境變數
           VITE_FINNHUB_API_KEY: ${{ secrets.VITE_FINNHUB_API_KEY }}
           VITE_GOOGLE_API_KEY: ${{ secrets.VITE_GOOGLE_API_KEY }}
           VITE_FIREBASE_CONFIG_STRING: ${{ secrets.VITE_FIREBASE_CONFIG_STRING }}
 
-      - name: Deploy
+      # 將建置好的 dist 資料夾存起來傳給下一個 job
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+
+  # 第二階段：部署 (Deploy)
+  deploy:
+    needs: build  # 必須等 build 成功才執行
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 下載上一個階段建置好的檔案
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: dist
