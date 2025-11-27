@@ -50,18 +50,24 @@ export enum TimeRange {
   YEAR = '1Y'
 }
 
-// Ensure global env vars are typed (although in vite usually import.meta.env, we use process.env for compatibility with some bundlers and the prompt instructions)
+// Global Definitions
 declare global {
   interface Window {
     // For specific browser capabilities if needed
-    aistudio?: {
-      hasSelectedApiKey: () => Promise<boolean>;
-      openSelectKey: () => Promise<void>;
+  }
+
+  // Augment NodeJS namespace directly to avoid conflict with var declarations
+  namespace NodeJS {
+    interface ProcessEnv {
+      API_KEY: string;
+      [key: string]: any;
     }
   }
 
   interface ImportMetaEnv {
     readonly VITE_FINNHUB_API_KEY: string;
+    readonly VITE_GOOGLE_API_KEY: string;
+    readonly VITE_FIREBASE_CONFIG_STRING: string;
     [key: string]: any;
   }
 
