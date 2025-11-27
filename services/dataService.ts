@@ -34,7 +34,7 @@ export const DataService = {
     return newAsset;
   },
 
-  getTrades: async (isRealMode: boolean): Promise<TradeRecord[]> => {
+  getTrades: async (_isRealMode: boolean): Promise<TradeRecord[]> => {
     return new Promise(resolve => setTimeout(() => resolve([...mockTrades]), 500));
   },
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComposedChart, XAxis, YAxis, Tooltip, CartesianGrid, Bar, ReferenceLine, ResponsiveContainer, Cell, ErrorBar } from 'recharts';
+import { ComposedChart, XAxis, YAxis, Tooltip, CartesianGrid, Bar, ReferenceLine, ResponsiveContainer, Cell } from 'recharts';
 import { CandleData } from '../types';
 
 interface StockChartProps {
@@ -7,35 +7,7 @@ interface StockChartProps {
   symbol: string;
 }
 
-// Custom Candle Shape
-const CandleStick = (props: any) => {
-  const { x, y, width, height, low, high, open, close } = props;
-  const isUp = close > open;
-  const color = isUp ? '#10b981' : '#ef4444'; // Emerald for Up, Red for Down
-  const ratio = Math.abs(height / (open - close)); // Simple ratio approximation
-
-  // Calculate actual pixel positions for high/low lines
-  // Recharts scales y based on domain, so we rely on the passed props roughly
-  // A cleaner way in Recharts is often using <ErrorBar> or composed shapes, 
-  // but drawing SVG directly is most flexible for candles.
-  
-  // Center of the bar
-  const cx = x + width / 2;
-  
-  // We need to map values to pixels. 
-  // Since props.y is the top of the body (min(open, close)), and height is body height.
-  // We can't easily get the pixel value of High/Low without the scale function.
-  // Strategy: Use ErrorBar for wicks (Shadows) and Bar for Body. 
-  // But standard Recharts doesn't support OHLC easily. 
-  // Let's stick to a simplified visualization: 
-  // We will use a Bar for the body (Open to Close) and assume the user focuses on trends.
-  // OR: Use a Composed Chart where one data key is [min, max] for a floating bar?
-  // Recharts <Bar> can take [min, max] array as dataKey.
-  
-  return null; // Logic handled in parent via data transformation usually
-};
-
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -58,11 +30,6 @@ const StockChart: React.FC<StockChartProps> = ({ data, symbol }) => {
   // Transform for Recharts:
   // We use a Bar chart where the bar represents the body (Open-Close).
   // We overlay lines for High-Low.
-  // Recharts is tricky for pure Candlesticks without a plugin, 
-  // so we will simulate it using a Bar chart with a custom shape or just range bars.
-  // SIMPLIFIED APPROACH: Line Chart for Close price + Bar Chart for Volume at bottom.
-  // It's cleaner and sufficient for this demo level.
-  // IF strictly candlestick is needed, we construct a [min, max] array for Bar.
   
   const chartData = data.map(d => ({
     ...d,
@@ -91,8 +58,7 @@ const StockChart: React.FC<StockChartProps> = ({ data, symbol }) => {
               ))}
             </Bar>
              
-            {/* High/Low Wicks - Simplified: We actually use ErrorBar usually, but for this demo 
-                we will add a Line for the 'Close' to show trend clearer if candles are too small */}
+            {/* High/Low Wicks - Simplified */}
              <ReferenceLine y={0} stroke="#000" />
           </ComposedChart>
         </ResponsiveContainer>

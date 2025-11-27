@@ -42,7 +42,7 @@ const Dashboard: React.FC<DashboardProps> = ({ assets, trades, onAddAsset }) => 
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={assets}
+                  data={assets as any}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -50,7 +50,7 @@ const Dashboard: React.FC<DashboardProps> = ({ assets, trades, onAddAsset }) => 
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {assets.map((entry, index) => (
+                  {assets.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>

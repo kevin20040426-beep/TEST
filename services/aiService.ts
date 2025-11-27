@@ -24,9 +24,12 @@ export const AIService = {
           contents: prompt,
         });
 
+        // 安全處理 response.text (可能為 undefined)
+        const summaryText = response.text ? response.text.trim() : "無法取得分析內容";
+
         return {
           symbol,
-          summary: response.text.trim(),
+          summary: summaryText,
           recommendation: "基於 AI 分析",
           loading: false
         };
